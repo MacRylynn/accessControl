@@ -69,4 +69,30 @@ MyBatis从数据库映射到对象的配置，很多参数可以自行百度，�
 两个mapper包都是使用2.2中的工程生成的（带有注释的是手动写的，主要适应不同的业务需求）。main中的mapper包中的类，是操作数据库的方法申明，resource中的mapper包是main中mapper包中方法的实现。  
 resource中的mapper包下的extend包是手动写的sql（带有注释的那些方法的实现）
 
+#### 2.3.6 service包
+包中是主要的业务方法的申明和实现。接口中是业务流程会用到的所有方法的申明。service包中的impl包是接口的实现，主要体现Java面向接口编程，不对外暴露任何业务细节的思想。
+
+#### 2.3.7 domain包
+包中的类是与Web直接交互的类，包括请求类、响应类等，是对数据进行了包装，称之为数据传输层。因为在实际项目中，考虑到安全性，往往不会将数据库映射出来的entity直接与Web进行交互。
+
+#### 2.3.8 controller包
+可以理解为连接前端和后端的方式。类的最上方的注解@RequestMapping("/web/wx")表示根路径，使用一下方法得到所有住户的信息。
+``` 
+   @PostMapping("/getallrecords")
+    public CommonResponse<List<UserRes>> getAllRecords() {
+        logger.info("AccessManagementCtrl|getAllRecords，查询所有用户进出信息");
+        CommonResponse<List<UserRes>> res = new CommonResponse<>();
+        List<UserRes> result = accessManagementService.getAllRecords();
+        res.setResultData(result);
+        return res;
+    }
+ ``` 
+@PostMapping("/getallrecords")表示使用post方法，并且在根路径中加分路径，即前端使用电脑ip和application.properties的端口号+根路径+分路径就能访问这个方法，比如：http//:127.0.0.1:8088/web/wx/getallrecords。具体使用的时候均使用post方法，保证一定的安全性。  
+整个实现方法中入参为空，返回有所的住户信息。
+
+#### 2.3.9 AccessAplication类
+是整个项目的启动类，如果需要打包并且在tomcat运行，则需要继承SpringBootServletInitializer类，详情可以自行百度。
+
 ## 3. 使用流程
+编码：设计数据库-> 数据库映射为对象-> 业务中操作对象-> 与前端交互
+访问：前端请求-> controller层-> 调用service中的方法-> 调用mapper中的方法-> 实现数据库的增删改查
